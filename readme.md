@@ -56,18 +56,31 @@ The server provides the following tools for Claude to use:
    - Required: content (title of the task)
    - Optional: description, due_string, priority
 
-2. **todoist_get_tasks**: Get a list of tasks from Todoist with various filters
-   - Optional: project_id, filter, priority, limit
+2. **get_tasks**: Get a list of tasks from Todoist with various filters
+   - Optional: 
+      - project_id, 
+      - project_name,
+      - task_name,
+      - priority,
+      - labels,
+      - is_overdue,
+      - limit
 
-3. **todoist_update_task**: Update an existing task by searching for it by name
-   - Required: task_name
-   - Optional: content, description, due_string, priority
+3. **update_task**: Update an existing task by searching for it by name
+   - Required: task_id
+   - Optional: 
+      - content, 
+      - description, 
+      - labels,
+      - priority,
+      - due_date (YYYY-MM-DD),
+      - deadline_date (YYYY-MM-DD)
 
-4. **todoist_delete_task**: Delete a task by searching for it by name
-   - Required: task_name
+4. **delete_task**: Delete a task by searching for it by name
+   - Required: task_id
 
-5. **todoist_complete_task**: Mark a task as complete by searching for it by name
-   - Required: task_name
+5. **complete_task**: Mark a task as complete by searching for it by name
+   - Required: task_id
 
 ## Example Interactions
 
