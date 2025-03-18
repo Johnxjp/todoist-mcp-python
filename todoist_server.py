@@ -1,7 +1,10 @@
 from dataclasses import dataclass
+import logging
 import os
 import sys
+from typing import Literal, Optional
 
+from mcp.server.lowlevel import server 
 from mcp.server.fastmcp import FastMCP, Context
 from todoist_api_python.api import TodoistAPI
 
@@ -12,12 +15,7 @@ TODOIST_API_KEY = os.getenv('TODOIST_API_KEY')
 
 todoist_api = TodoistAPI(TODOIST_API_KEY)
 mcp = FastMCP("todoist-server", dependencies=["todoist_api_python"])
-
-@mcp.tool()
-def output_context(ctx: Context):
-    """ Output the context """
-    for i in range(10):
-        ctx.info(f"Processing file: {i}")
+logger = logging.getLogger('todoist_server')
 
 @dataclass
 class Project:
@@ -34,13 +32,58 @@ class TodoistProjectResponse:
 
 @mcp.tool()
 def get_projects() -> list[Project]:
-    """ Get all projects """
+    """ Get all todo projects. These are like folders for tasks in Todoist """
     try:
         projects: TodoistProjectResponse = todoist_api.get_projects()
         return [Project(p.id, p.name) for p in projects]
     except Exception as e:
-        return f"Couldn't fetch projects {str(e)}"
+        return f"Error: Couldn't fetch projects {str(e)}"
+
+
+def get_project_id_by_name(project_name: str) -> str:
+    """ Search for a project by name and return its ID """
+    projects = get_projects()
+    for project in projects:
+        if project.name.lower() == project_name.lower():
+            return project.id
+    return None
+
+
+@mcp.tool()
+def get_tasks(
+    ctx: Context,
+    project_id: Optional[str] = None, 
+    project_name: Optional[str] = None, 
+    labels: Optional[list[str]] = None, 
+    priority: Optional[Literal[1, 2, 3, 4]] = None
+) -> list[str]:
+    """ 
+    Fetch user's tasks. These can be filtered by project, labels, time, etc. If no filters are provided, all tasks are returned.
+
+    Args:
+        project_id: The string ID of the project to fetch tasks from. Example '1234567890'
+        project_name: Name of the project to fetch tasks from. Example 'Work' or 'Inbox'
+        labels: Filter tasks by labels
+        priority: Filter tasks by priority level
+    """
+
+    # How to implement "did you mean this project?" feature?
+    if project_name:
+        project_id = get_project_id_by_name(project_name)
+        if not project_id:
+            raise ValueError(f"Project '{project_name}' not found")
+
+    tasks = todoist_api.get_tasks(project_id=project_id.strip())
+    if labels:
+        for label in labels:
+            tasks = [t for t in tasks if label in t.labels]
+
+    if priority:
+        tasks = [t for t in tasks if t.priority == priority]
     
+    return [t.content for t in tasks]
+
+
 
 if __name__ == "__main__":
     # Initialize and run the server
