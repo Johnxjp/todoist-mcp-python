@@ -75,7 +75,7 @@ The server provides the following tools for Claude to use:
       - section_id,
       - labels
 
-2. **get_tasks**: Get a list of tasks from Todoist with various filters
+2. **get_tasks**: Get a list of tasks and Ids from Todoist with various filters
    - Optional: 
       - project_id, 
       - project_name,
