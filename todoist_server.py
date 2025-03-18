@@ -155,6 +155,19 @@ def create_task(
         data = {}
         if description:
             data["description"] = description
+        if project_id:
+            data["project_id"] = project_id
+        if labels:
+            if isinstance(labels) == str:
+                labels = [labels]
+            data["labels"] = labels
+        if priority:
+            data["priority"] = priority
+        if due_date:
+            data["due_date"] = due_date
+        if section_id:
+            data["section_id"] = section_id
+
         task = todoist_api.add_task(content, **data)
         return task.id
     except Exception as e:
