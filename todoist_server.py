@@ -158,7 +158,7 @@ def create_task(
         if project_id:
             data["project_id"] = project_id
         if labels:
-            if isinstance(labels) == str:
+            if isinstance(labels, str):
                 labels = [labels]
             data["labels"] = labels
         if priority:
@@ -168,7 +168,7 @@ def create_task(
         if section_id:
             data["section_id"] = section_id
 
-        task = todoist_api.add_task(content, **data)
+        task = todoist_api.add_task(content, data)
         return task.id
     except Exception as e:
         raise Exception(f"Couldn't create task {str(e)}")
@@ -206,7 +206,7 @@ def update_task(
         if description:
             data["description"] = description
         if labels:
-            if isinstance(labels) == str:
+            if isinstance(labels, str):
                 labels = [labels]
             data["labels"] = labels
         if priority:
