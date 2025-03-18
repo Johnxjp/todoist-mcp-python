@@ -1,6 +1,6 @@
-# Todoist MCP Server for Claude
+# Todoist Python MCP Server
 
-This is a Managed Context Profile (MCP) server that allows Claude to interact with Todoist, enabling task management capabilities through natural language. The server acts as an intermediary between Claude and the Todoist API, handling authentication, data transformation, and command processing.
+This is a Managed Context Profile (MCP) server that allows MCP Clients like Claude to interact with Todoist, enabling task management capabilities through natural language. The server acts as an intermediary between Claude and the Todoist API, handling authentication, data transformation, and command processing.
 
 ## Features
 
@@ -10,33 +10,46 @@ This is a Managed Context Profile (MCP) server that allows Claude to interact wi
 
 ## Prerequisites
 
-- Python 3.8 or higher
+- Python 3.10 or higher
+- uv
 - A Todoist account and API token
 
-## Installation
+### How to get Todoist API Token
+1. Login to your Todoist account
+2. Go to User Settings -> Integrations -> Developer
+3. Copy API token
 
-1. Clone this repository:
-   ```
-   git clone https://github.com/yourusername/todoist-mcp.git
-   cd todoist-mcp
-   ```
+## Usage with Claude Desktop
 
-2. Install the required dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+First clone this locally e.g. with SSH
 
-3. Create a `.env` file based on the `.env.example` file:
-   ```
-   cp .env.example .env
-   ```
+```
+git clone git@github.com:Johnxjp/todoist-mcp-python.git
+```
 
-4. Edit the `.env` file and add your Todoist API token:
-   ```
-   TODOIST_API_TOKEN=your_todoist_api_token_here
-   ```
-
-   You can get your API token from [Todoist Settings > Integrations](https://todoist.com/app/settings/integrations).
+Then add to your Claude config file.
+```
+{
+  "mcpServers": {
+    "todoist-server": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--with",
+        "mcp[cli]",
+        "--with",
+        "todoist_api_python",
+        "mcp",
+        "run",
+        "/full/path/to/todoist_server.py"
+      ],
+      "env": {
+        "TODOIST_API_TOKEN": "YOUR_API_TOKEN"
+      }
+    }
+  }
+}
+```
 
 ## Usage
 

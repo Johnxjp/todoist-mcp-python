@@ -9,8 +9,8 @@ from mcp.server.fastmcp import FastMCP
 from todoist_api_python.api import TodoistAPI
 
 
-TODOIST_API_KEY = os.getenv("TODOIST_API_KEY")
-todoist_api = TodoistAPI(TODOIST_API_KEY)
+TODOIST_API_TOKEN = os.getenv("TODOIST_API_TOKEN")
+todoist_api = TodoistAPI(TODOIST_API_TOKEN)
 mcp = FastMCP("todoist-server", dependencies=["todoist_api_python"])
 logger = logging.getLogger("todoist_server")
 
