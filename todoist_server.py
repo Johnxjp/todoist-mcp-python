@@ -1,18 +1,15 @@
 from dataclasses import dataclass
+from datetime import datetime
 import logging
 import os
 import sys
 from typing import Literal, Optional
-
-from mcp.server.lowlevel import server 
-from mcp.server.fastmcp import FastMCP, Context
+ 
+from mcp.server.fastmcp import FastMCP
 from todoist_api_python.api import TodoistAPI
 
 
 TODOIST_API_KEY = os.getenv('TODOIST_API_KEY')
-# if not TODOIST_API_KEY:
-#     raise Exception('TODOIST_API_KEY not set. Add to MCP config file.')
-
 todoist_api = TodoistAPI(TODOIST_API_KEY)
 mcp = FastMCP("todoist-server", dependencies=["todoist_api_python"])
 logger = logging.getLogger('todoist_server')
@@ -28,6 +25,13 @@ class Project:
 class TodoistProjectResponse:
     id: str
     name: str
+
+
+def date_difference(date1: str, date2: str) -> int:
+    """ Compare two dates in the format 'YYYY-MM-DD' """
+    date1 = datetime.strptime(date1, '%Y-%m-%d')
+    date2 = datetime.strptime(date2, '%Y-%m-%d')
+    return (date1 - date2).days
 
 
 @mcp.tool()
@@ -52,20 +56,25 @@ def get_project_id_by_name(project_name: str) -> str:
 @mcp.tool()
 def get_tasks(
     project_id: Optional[str] = None, 
-    project_name: Optional[str] = None, 
-    labels: Optional[list[str]] = None, 
+    project_name: Optional[str] = None,
+    task_name: Optional[str] = None,
+    labels: Optional[list[str]] = None,
+    due_date: Optional[str] = None,
+    is_overdue: Optional[bool] = None,
     priority: Optional[Literal[1, 2, 3, 4]] = None,
 ) -> list[str]:
     """ 
     Fetch user's tasks. These can be filtered by project, labels, time, etc. If no filters are provided, all tasks are returned.
 
     Args:
-        project_id: The string ID of the project to fetch tasks from. Example '1234567890'
-        project_name: Name of the project to fetch tasks from. Example 'Work' or 'Inbox'
-        labels: List of tags used to filter tasks.
-        priority: Filter tasks by priority level. 4 (urgent), 3 (high), 2 (normal), 1 (low)
+    - project_id: The string ID of the project to fetch tasks from. Example '1234567890'
+    - project_name: Name of the project to fetch tasks from. Example 'Work' or 'Inbox'
+    - task_name: Filter tasks by name. Example 'Buy groceries'
+    - labels: List of tags used to filter tasks.
+    - priority: Filter tasks by priority level. 4 (urgent), 3 (high), 2 (normal), 1 (low)
+    - due_date: Specific due date in YYYY-MM-DD format. Example '2021-12-31'
+    - is_overdue: Filter tasks that are overdue.
     """
-
     tasks = todoist_api.get_tasks()
     
     # How to implement "did you mean this project?" feature?
@@ -77,6 +86,16 @@ def get_tasks(
     if project_id:
         tasks = [t for t in tasks if t.project_id == project_id]
 
+    if task_name:
+        tasks = [t for t in tasks if task_name.lower() in t.content.lower()]
+
+    if due_date:
+        tasks = [t for t in tasks if t.due and t.due['date'] == due_date]
+
+    if is_overdue is not None:
+        now = datetime.today().strftime('%Y-%m-%d')
+        tasks = [t for t in tasks if t.due and (date_difference(now, t.due['date']) < 0)  == is_overdue]
+
     if labels:
         for label in labels:
             tasks = [t for t in tasks if label.lower() in [l.lower() for l in t.labels]]
@@ -84,8 +103,74 @@ def get_tasks(
     if priority:
         tasks = [t for t in tasks if t.priority == priority]
     
-    return [t.content for t in tasks]
+    return [{"id": t.id, "title": t.content} for t in tasks]
 
+
+@mcp.tool()
+def delete_task(task_id: str):
+    """ Delete a task by its ID """
+    try:
+        is_success = todoist_api.delete_task(task_id=task_id)
+        if not is_success:
+            raise Exception
+        return "Task deleted successfully"
+    except Exception as e:
+        raise Exception(f"Couldn't delete task {str(e)}")
+    
+
+@mcp.tool()
+def update_task(
+    task_id: str | int,
+    content: Optional[str] = None,
+    description: Optional[str] = None,
+    labels: Optional[list[str]] = None,
+    priority: Optional[int] = None,
+    due_string: Optional[str] = None,
+    due_date: Optional[str] = None,
+    due_datetime: Optional[str] = None,
+    deadline_date: Optional[str] = None,
+):
+    """ 
+    Update an attribute of a task given its ID. Any attribute can be updated. 
+
+    Args:
+    - task_id [str | int]: The ID of the task to update. Example '1234567890' or 1234567890
+    - content [str]: Task content. This value may contain markdown-formatted text and hyperlinks. Details on markdown support can be found in the Text Formatting article in the Help Center.
+    - description [str]: A description for the task. This value may contain markdown-formatted text and hyperlinks. Details on markdown support can be found in the Text Formatting article in the Help Center.
+    - labels [list[str]]: The task's labels (a list of names that may represent either personal or shared labels).
+    - priority [int]: Task priority from 1 (normal) to 4 (urgent).
+    - due_string [str]: Human defined task due date (ex.: "next Monday", "Tomorrow"). Value is set using local (not UTC) time. Using "no date" or "no due date" removes the date.
+    - due_date [str]: Specific date in YYYY-MM-DD format relative to user’s timezone.
+    - due_datetime [str]: Specific date and time in RFC3339 format in UTC.
+    - deadline_date [str]: Specific date in YYYY-MM-DD format relative to user’s timezone.
+    
+    """
+
+    # Client sometimes struggle to convert int to str
+    task_id = str(task_id)
+    try:
+        data = {}
+        if content: data['content'] = content
+        if description: data['description'] = description
+        if labels:
+            if isinstance(labels) == str:
+                labels = [labels]
+            data['labels'] = labels
+        if priority: data['priority'] = priority
+        if due_string: data['due_string'] = due_string
+        if due_date: data['due_date'] = due_date
+        if due_datetime: data['due_datetime'] = due_datetime
+        if deadline_date: data['deadline_date'] = deadline_date
+        
+        is_success = todoist_api.update_task(
+            task_id=task_id, **data
+        )
+        if not is_success:
+            raise Exception
+
+        return "Task updated successfully"
+    except Exception as e:
+        raise Exception(f"Couldn't update task {str(e)}")
 
 
 if __name__ == "__main__":
