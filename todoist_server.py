@@ -127,6 +127,41 @@ def delete_task(task_id: str):
 
 
 @mcp.tool()
+def create_task(
+    content: str,
+    description: Optional[str] = None,
+    project_id: Optional[str] = None,
+    labels: Optional[list[str]] = None,
+    priority: Optional[int] = None,
+    due_date: Optional[str] = None,
+    section_id: Optional[str] = None,
+) -> str:
+    """
+    Create a new task
+
+    Args:
+    - content [str]: Task content. This value may contain markdown-formatted text and hyperlinks. Details on markdown support can be found in the Text Formatting article in the Help Center.
+    - description [str]: A description for the task. This value may contain markdown-formatted text and hyperlinks. Details on markdown support can be found in the Text Formatting article in the Help Center.
+    - project_id [str]: The ID of the project to add the task. If none, adds to user's inbox by default.
+    - labels [list[str]]: The task's labels (a list of names that may represent either personal or shared labels).
+    - priority [int]: Task priority from 1 (normal) to 4 (urgent).
+    - due_date [str]: Specific date in YYYY-MM-DD format relative to user’s timezone.
+    - section_id [str]: The ID of the section to add the task to
+
+    Returns:
+    - task_id: str:
+    """
+    try:
+        data = {}
+        if description:
+            data["description"] = description
+        task = todoist_api.add_task(content, **data)
+        return task.id
+    except Exception as e:
+        raise Exception(f"Couldn't create task {str(e)}")
+
+
+@mcp.tool()
 def update_task(
     task_id: str,
     content: Optional[str] = None,
