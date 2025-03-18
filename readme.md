@@ -10,7 +10,7 @@ This is a Managed Context Profile (MCP) server that allows MCP Clients like Clau
 
 ## Prerequisites
 
-- Python 3.10 or higher
+- Python 3.12
 - uv
 - A Todoist account and API token
 
