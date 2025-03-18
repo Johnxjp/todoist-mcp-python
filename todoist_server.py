@@ -211,12 +211,8 @@ def update_task(
             data["labels"] = labels
         if priority:
             data["priority"] = priority
-        if due_string:
-            data["due_string"] = due_string
         if due_date:
             data["due_date"] = due_date
-        if due_datetime:
-            data["due_datetime"] = due_datetime
         if deadline_date:
             data["deadline_date"] = deadline_date
 
