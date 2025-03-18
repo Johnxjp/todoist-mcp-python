@@ -65,9 +65,15 @@ The server will start and listen for requests on stdio.
 
 The server provides the following tools for Claude to use:
 
-1. **todoist_create_task**: Create a new task in Todoist
+1. **create_task**: Create a new task in Todoist
    - Required: content (title of the task)
-   - Optional: description, due_string, priority
+   - Optional: 
+      - description, 
+      - due_date, 
+      - priority, 
+      - project_id, 
+      - section_id,
+      - labels
 
 2. **get_tasks**: Get a list of tasks from Todoist with various filters
    - Optional: 
