@@ -1,0 +1,10 @@
+[project]
+name = "todoist-mcp"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp[cli]>=1.4.1",
+    "todoist-api-python>=2.1.7",
+]
