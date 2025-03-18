@@ -168,7 +168,7 @@ def create_task(
         if section_id:
             data["section_id"] = section_id
 
-        task = todoist_api.add_task(content, data)
+        task = todoist_api.add_task(content, **data)
         return task.id
     except Exception as e:
         raise Exception(f"Couldn't create task {str(e)}")
