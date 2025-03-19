@@ -51,16 +51,6 @@ Then add to your Claude config file.
 }
 ```
 
-## Usage
-
-Run the MCP server:
-
-```
-python todoist_mcp_server.py
-```
-
-The server will start and listen for requests on stdio.
-
 ## Available Tools
 
 The server provides the following tools for Claude to use:
