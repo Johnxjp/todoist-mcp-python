@@ -1,6 +1,6 @@
 # Todoist Python MCP Server
 
-This is a Model Context Profile (MCP) server that allows MCP Clients like Claude to interact with Todoist, enabling task management capabilities through natural language. The server acts as an intermediary between Claude and the Todoist API, handling authentication, data transformation, and command processing.
+This is a Model Context Protocol (MCP) server that allows MCP Clients like Claude to interact with Todoist, enabling task management capabilities through natural language. The server acts as an intermediary between Claude and the Todoist API, handling authentication, data transformation, and command processing.
 
 ## Features
 
