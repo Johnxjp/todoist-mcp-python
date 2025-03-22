@@ -34,7 +34,7 @@ Then add this configuration to your Claude settings:
 {
   "mcpServers": {
     "todoist-server": {
-      "command": "mcp-server-todoist",
+      "command": "mcp-server-todoist", # AI! Should be uvx and args like above
       "env": {
         "TODOIST_API_TOKEN": "YOUR_API_TOKEN"
       }
