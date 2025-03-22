@@ -238,7 +238,10 @@ def complete_task(task_id: str) -> str:
         raise Exception(f"Couldn't close task {str(e)}")
 
 
-if __name__ == "__main__":
-    # Initialize and run the server
+def main():
+    """Entry point for the installed package"""
     print("...", file=sys.stderr)
     mcp.run(transport="stdio")
+
+if __name__ == "__main__":
+    main()
