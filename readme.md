@@ -21,13 +21,41 @@ This is a Model Context Protocol (MCP) server that allows MCP Clients like Claud
 
 ## Usage with Claude Desktop
 
-First clone this locally e.g. with SSH
+## Run via UVX (without cloning)
 
+You can run the server directly from GitHub using UVX:
+
+```bash
+uvx --from https://github.com/Johnxjp/todoist-mcp-python.git mcp-server-todoist
 ```
+
+Then add this configuration to your Claude settings:
+```
+{
+  "mcpServers": {
+    "todoist-server": {
+      "command": "uvx",
+      "args": [
+        "--from", 
+        "https://github.com/Johnxjp/todoist-mcp-python.git", 
+        "mcp-server-todoist"],
+      "env": {
+        "TODOIST_API_TOKEN": "YOUR_API_TOKEN"
+      }
+    }
+  }
+}
+```
+
+## Run from cloned repository
+
+If you prefer to clone the repository, use these commands:
+
+```bash
 git clone git@github.com:Johnxjp/todoist-mcp-python.git
 ```
 
-Then add to your Claude config file.
+Then add to your Claude config file:
 ```
 {
   "mcpServers": {

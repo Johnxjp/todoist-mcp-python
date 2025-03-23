@@ -8,3 +8,6 @@ dependencies = [
     "mcp[cli]>=1.4.1",
     "todoist-api-python>=2.1.7",
 ]
+
+[project.scripts]
+mcp-server-todoist = "todoist_server:main"
