@@ -110,7 +110,15 @@ def get_tasks(
     if priority:
         tasks = [t for t in tasks if t.priority == priority]
 
-    return [{"id": t.id, "title": t.content} for t in tasks][:limit]
+    return [
+        {
+            "id": t.id,
+            "title": t.content,
+            "priority": t.priority,
+            "due": t.due["date"] if t.due else None,
+        }
+        for t in tasks
+    ][:limit]
 
 
 @mcp.tool()
