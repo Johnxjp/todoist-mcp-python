@@ -1,6 +1,6 @@
-# Todoist Python MCP Server
+# Todoist MCP Server
 
-This is a Model Context Protocol (MCP) server that allows MCP Clients like Claude to interact with Todoist, enabling task management capabilities through natural language. The server acts as an intermediary between Claude and the Todoist API, handling authentication, data transformation, and command processing.
+A Model Context Protocol (MCP) server that allows clients like Claude to interact with Todoist, enabling task management capabilities through natural language. The server acts as an intermediary between clients and the Todoist API, handling authentication, data transformation, and command processing. This is a Python version
 
 ## Features
 
@@ -38,7 +38,8 @@ Then add this configuration to your Claude settings:
       "args": [
         "--from", 
         "https://github.com/Johnxjp/todoist-mcp-python.git", 
-        "mcp-server-todoist"],
+        "mcp-server-todoist"
+      ],
       "env": {
         "TODOIST_API_TOKEN": "YOUR_API_TOKEN"
       }
